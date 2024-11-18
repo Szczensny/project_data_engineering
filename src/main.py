@@ -13,6 +13,7 @@ def job(file_path:str, catalog_name:str) -> None:
         print(f'Processing chunk no {counter} from file {file_path}')
         mongo.upload_df(chunk, catalog_name, "sensors_db")
         counter += 1
+        del chunk
     
     print(f'Finished working on file: {file_path}')
 
@@ -34,7 +35,7 @@ def execute() -> None:
     start = time.time()
     processing_tasks = []
     processing_files = get_files_list()
-    pool = ThreadPoolExecutor(5)
+    pool = ThreadPoolExecutor(4)
     for catalog_name, data_file_list in processing_files.items():
         for data_file in data_file_list:
             task = pool.submit(job, data_file, catalog_name)
@@ -42,10 +43,6 @@ def execute() -> None:
     processing_tasks[-1].result()
     end = time.time()
     print(end - start)
-
-
-
-
 
 if __name__ == '__main__':
     execute()

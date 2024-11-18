@@ -48,6 +48,5 @@ class PyMongoUtils():
             db (str): _description_
         """
         data = df.to_dict('records')
-        print(data)
         collection_client = self.get_collection(db=db, colection=sensor_type)
         collection_client.insert_many(data)
