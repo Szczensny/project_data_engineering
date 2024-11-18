@@ -4,11 +4,6 @@ import pandas as pd
 import pymongo.synchronous
 import pymongo.synchronous.collection
 
-client = pymongo.MongoClient(host='localhost', port=27017, username="root", password="example")
-mydb = client['sensors_data']
-my_colection = mydb['test_colection']
-print(type(my_colection))
-
 class PyMongoUtils():
     def __init__(self, host:str=None, port:int=None, username:str=None, password:str=None) -> None:
         """ PyMongoUtils is a class that simplyfies the process of interacing with MongoDB
@@ -39,7 +34,7 @@ class PyMongoUtils():
         Returns:
             pymongo.synchronous.collection.Collection: _description_
         """
-        client = pymongo.MongoClient(host=self.host, port=self.port, username=self.username, password=self.password)
+        client = pymongo.MongoClient(host=self.host, port=int(self.port), username=self.username, password=self.password)
         mongo_db = client[db]
         collection = mongo_db[colection]
         return collection
@@ -52,9 +47,7 @@ class PyMongoUtils():
             sensor_type (str): _description_
             db (str): _description_
         """
-        data = df.to_records(index=False)
+        data = df.to_dict('records')
+        print(data)
         collection_client = self.get_collection(db=db, colection=sensor_type)
         collection_client.insert_many(data)
-
-        
-pu = PyMongoUtils()
