@@ -21,3 +21,17 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+  
+  data-import:
+    build: .
+    restart: no
+    environment:
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=example
+    entrypoint: "python src/main.py"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - mongo
