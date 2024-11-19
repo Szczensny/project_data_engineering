@@ -7,6 +7,7 @@ from typing import Union, List, Dict
 import logging
 from utils.exceptions import UploadException
 
+
 logging.basicConfig(level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M")
 
 def job(file_path:Union[str, Path], catalog_name:str) -> None:
@@ -32,8 +33,6 @@ def job(file_path:Union[str, Path], catalog_name:str) -> None:
     
     logging.info(f'Finished working on file: {file_path}')
 
-
-
 def get_files_list() -> Dict[str, List[Path]]:
     """Generates dictionray with list of files.
 
@@ -49,7 +48,6 @@ def get_files_list() -> Dict[str, List[Path]]:
                     file_list.append(csv_file)
             files_to_process[data_file.name] = file_list
     return files_to_process
-
 
 def execute() -> None:
     """Main execution function of script with Trhead logic
