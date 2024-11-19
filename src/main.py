@@ -3,13 +3,19 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 import pandas as pd
 import time
-from typing import List
+from typing import Union, List, Dict
 import logging
 from utils.exceptions import UploadException
 
 logging.basicConfig(level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M")
 
-def job(file_path:str, catalog_name:str) -> None:
+def job(file_path:Union[str, Path], catalog_name:str) -> None:
+    """ Upload job definision. Csv file will be loaded into MongoDB in chunks
+
+    Args:
+        file_path (str, Path): File path or Path objcet to the file
+        catalog_name (str): Name of the paret catalog of file
+    """
     logging.info(f'Start working on file: {file_path}')
     mongo = PyMongoUtils()
     counter = 1
@@ -28,7 +34,12 @@ def job(file_path:str, catalog_name:str) -> None:
 
 
 
-def get_files_list() -> dict:
+def get_files_list() -> Dict[str, List[Path]]:
+    """Generates dictionray with list of files.
+
+    Returns:
+        Dict[str, List[str]]: dictionary {"<catalog_name>": [Path,Path]}
+    """
     files_to_process = dict()
     for data_file in Path('data').iterdir():    
         if Path(data_file).is_dir():
@@ -41,6 +52,8 @@ def get_files_list() -> dict:
 
 
 def execute() -> None:
+    """Main execution function of script with Trhead logic
+    """
     start = time.time()
     logging.info(f'Starting process')
     processing_tasks = []

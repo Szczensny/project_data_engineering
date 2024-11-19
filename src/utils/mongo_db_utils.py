@@ -27,11 +27,11 @@ class PyMongoUtils():
             raise ValueError('Credentails are not provided')
     
     def get_collection(self, db:str, colection:str)-> pymongo.synchronous.collection.Collection:
-        """_summary_
+        """ Based on the login data generates client assigned directly to MongoDB collection
 
         Args:
-            db (str): _description_
-            colection (str): _description_
+            db (str): name of the target database
+            colection (str): name of the collection
 
         Returns:
             pymongo.synchronous.collection.Collection: _description_
@@ -43,12 +43,13 @@ class PyMongoUtils():
         return collection
         
     def upload_df(self, df:pd.DataFrame, sensor_type:str, db:str) -> None:
-        """_summary_
+        """ Transfer of Pandas Dataframe content into MongoDB documents
 
         Args:
-            df (pd.DataFrame): _description_
-            sensor_type (str): _description_
-            db (str): _description_
+            df (pd.DataFrame): Pandas Dataframe with data. Each row will be transfered
+                               as the MongoDB document
+            sensor_type (str): type of sensor. Name will be used as MongoDB collection
+            db (str): Name of MongoDB database
         """
         try:
             logging.info(f'Start upload of data. DB: {db}, collection: {sensor_type}')
