@@ -3,6 +3,8 @@ import os
 import pandas as pd
 import pymongo.synchronous
 import pymongo.synchronous.collection
+import logging
+from utils.exceptions import UploadException
 
 class PyMongoUtils():
     def __init__(self, host:str=None, port:int=None, username:str=None, password:str=None) -> None:
@@ -34,6 +36,7 @@ class PyMongoUtils():
         Returns:
             pymongo.synchronous.collection.Collection: _description_
         """
+        logging.info(f'Connecting MongoDB at host: {self.host}')
         client = pymongo.MongoClient(host=self.host, port=int(self.port), username=self.username, password=self.password)
         mongo_db = client[db]
         collection = mongo_db[colection]
@@ -47,6 +50,12 @@ class PyMongoUtils():
             sensor_type (str): _description_
             db (str): _description_
         """
-        data = df.to_dict('records')
-        collection_client = self.get_collection(db=db, colection=sensor_type)
-        collection_client.insert_many(data)
+        try:
+            logging.info(f'Start upload of data. DB: {db}, collection: {sensor_type}')
+            data = df.to_dict('records')
+            collection_client = self.get_collection(db=db, colection=sensor_type)
+            collection_client.insert_many(data)
+            del collection_client
+            logging.info(f'Upload complete. DB: {db}, collection: {sensor_type}')
+        except Exception as e:
+            raise UploadException(f'Could not upload DataFrame into Mongo. DB: {db}, collection: {sensor_type}')

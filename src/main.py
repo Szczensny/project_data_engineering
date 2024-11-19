@@ -4,18 +4,27 @@ from pathlib import Path
 import pandas as pd
 import time
 from typing import List
+import logging
+from utils.exceptions import UploadException
+
+logging.basicConfig(level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M")
 
 def job(file_path:str, catalog_name:str) -> None:
-    print(f'Start working on file: {file_path}')
+    logging.info(f'Start working on file: {file_path}')
     mongo = PyMongoUtils()
     counter = 1
-    for chunk in pd.read_csv(filepath_or_buffer=file_path, chunksize=1000):
-        print(f'Processing chunk no {counter} from file {file_path}')
-        mongo.upload_df(chunk, catalog_name, "sensors_db")
-        counter += 1
-        del chunk
+    try:
+        for chunk in pd.read_csv(filepath_or_buffer=file_path, chunksize=1000):
+            logging.info(f'Processing chunk no {counter} from file {file_path}')
+            mongo.upload_df(chunk, catalog_name, "sensors_db")
+            counter += 1
+            del chunk
+    except (IOError, FileNotFoundError) as ne:
+        logging.error(f'Could not open file: {file_path}. Detals {ne}')
+    except UploadException as ue:
+        logging.error(f'Could not upload file {file_path} to MongoDB. Details {ue}')
     
-    print(f'Finished working on file: {file_path}')
+    logging.info(f'Finished working on file: {file_path}')
 
 
 
@@ -33,6 +42,7 @@ def get_files_list() -> dict:
 
 def execute() -> None:
     start = time.time()
+    logging.info(f'Starting process')
     processing_tasks = []
     processing_files = get_files_list()
     pool = ThreadPoolExecutor(4)
@@ -42,7 +52,7 @@ def execute() -> None:
             processing_tasks.append(task)
     processing_tasks[-1].result()
     end = time.time()
-    print(end - start)
+    logging.info(f'Finished procees. Execution time: {end - start} seconds')
 
 if __name__ == '__main__':
     execute()
