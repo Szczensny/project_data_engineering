@@ -20,7 +20,7 @@ As the result:
 
 ## Adding new data
 
-In folder `data` add subfolder and put csv files in it/
+In folder `data` add subfolder and put csv files in it
 
 ## Presitent data after removing containers
 In `docker-compose.yml` file uncomment line 13 and 14. Data from Mongo will presit on disk in `mongo_data` catalog that you can find in this repository
